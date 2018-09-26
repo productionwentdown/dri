@@ -3,6 +3,8 @@ FROM node:10-alpine as build
 # args
 ARG version="0.1.0"
 ARG repo="github.com/productionwentdown/dri"
+ENV VUE_APP_VERSION=${version}
+ENV VUE_APP_SOURCE_LINK="https://${repo}"
 
 # dependencies
 RUN apk add --no-cache git
@@ -21,7 +23,7 @@ FROM alpine:3.8
 ARG version
 
 # labels
-LABEL org.label-schema.vcs-url="https://github.com/productionwentdown/email-collector"
+LABEL org.label-schema.vcs-url="https://github.com/productionwentdown/dri"
 LABEL org.label-schema.version=${version}
 LABEL org.label-schema.schema-version="1.0"
 

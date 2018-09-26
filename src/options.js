@@ -1,5 +1,5 @@
-const version = process.env.VERSION || '[master]';
-const source = process.env.SOURCE_LINK || 'https://github.com/productionwentdown/dri';
+const version = process.env.VUE_APP_VERSION || '[master]';
+const source = process.env.VUE_APP_SOURCE_LINK || 'https://github.com/productionwentdown/dri';
 
 const defaultConfig = {
   merged: false,
