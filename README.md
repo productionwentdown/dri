@@ -1,5 +1,5 @@
 
-# dri
+# [dri](https://hub.docker.com/r/productionwentdown/dri/) [![](https://images.microbadger.com/badges/version/productionwentdown/dri.svg)](https://microbadger.com/images/productionwentdown/dri "Get your own version badge on microbadger.com") [![](https://images.microbadger.com/badges/image/productionwentdown/dri.svg)](https://microbadger.com/images/productionwentdown/dri "Get your own image badge on microbadger.com") [![Build Status](https://ci.makerforce.io/api/badges/pwd/dri/status.svg)](https://ci.makerforce.io/pwd/dri)
 
 A static Docker Distribution Registry viewer.
 
