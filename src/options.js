@@ -51,8 +51,8 @@ async function registryAPI() {
 
 async function usePortusExplore() {
   const c = await config();
-  if (c.registryAPI) {
-    return c.registryAPI;
+  if (c.usePortusExplore) {
+    return true;
   }
   return false;
 }
