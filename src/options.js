@@ -19,7 +19,7 @@ async function config() {
   }
 
   try {
-    const response = await fetch('/config.json');
+    const response = await fetch('config.json');
     const jsonConfig = await response.json();
     defaultConfig.merged = true;
     return Object.assign(defaultConfig, jsonConfig);

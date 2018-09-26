@@ -10,7 +10,7 @@ TAGS_PER_PAGE=${TAGS_PER_PAGE:=30}
 
 [[ "$USE_PORTUS_EXPLORE" != "true" ]] && [[ "$USE_PORTUS_EXPLORE" != "false" ]] && USE_PORTUS_EXPLORE=false
 
-sed -i "s~<base href=/>~<base href=\"$BASE_URL\">~" /srv/index.html
+sed -i "s~<base href=/ >~<base href=\"$BASE_URL\">~" /srv/index.html
 
 cat > /etc/Caddyfile << EOF
 :80$BASE_URL {
