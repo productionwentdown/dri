@@ -28,18 +28,18 @@ function parseWWWAuthenticate(text) {
 	return result;
 }
 
-let cachedToken = null;
-async function doAuth() {
-	if (cachedToken !== null) {
-		return cachedToken;
+const cachedTokens = {};
+async function doAuth(scope) {
+	if (cachedTokens[scope] !== null) {
+		return cachedTokens[scope];
 	}
 
 	// try accessing registry API
 	const response = await fetch(`${await registryAPI()}/v2/`);
 	if (response.ok) {
 		// token not needed for registry
-		cachedToken = false;
-		return cachedToken;
+		cachedTokens[scope] = false;
+		return cachedTokens[scope];
 	}
 	if (response.status !== 401) {
 		throw new Error(response.statusText);
@@ -58,21 +58,23 @@ async function doAuth() {
 	const tokURL = new URL(chal.realm);
 	tokURL.searchParams.append('client_id', 'dri-client');
 	tokURL.searchParams.append('service', chal.service);
-	tokURL.searchParams.append('scope', 'repository:pwd/migrate:pull');
+	tokURL.searchParams.append('scope', scope);
 	const tokResponse = await fetch(tokURL);
 	const tok = await tokResponse.json();
-	cachedToken = tok.token;
+	cachedTokens[scope] = tok.token;
 	return tok.token;
 }
 
-async function paginatable(path, n, last = null) {
-	const token = await doAuth();
+async function paginatable(path, scope, n, last = null) {
 	const url = new URL(`${await registryAPI()}${path}`);
 	if (n) url.searchParams.append('n', n);
 	if (last) url.searchParams.append('last', last);
 
 	const headers = {};
-	if (token) headers.Authorization = `Bearer ${token}`;
+	if (scope) {
+		const token = await doAuth(scope);
+		if (token) headers.Authorization = `Bearer ${token}`;
+	}
 	const response = await fetch(url, { headers });
 	let nextLast = null;
 	if (response.headers.has('Link')) {
@@ -84,20 +86,24 @@ async function paginatable(path, n, last = null) {
 	return Object.assign(await response.json(), { nextLast });
 }
 
-async function get(path) {
-	const token = await doAuth();
+async function get(path, scope) {
 	const url = new URL(`${await registryAPI()}${path}`);
 	const headers = {};
-	if (token) headers.Authorization = `Bearer ${token}`;
+	if (scope) {
+		const token = await doAuth(scope);
+		if (token) headers.Authorization = `Bearer ${token}`;
+	}
 	const response = await fetch(url, { headers });
 	return response.json();
 }
 
-async function head(path) {
-	const token = await doAuth();
+async function head(path, scope) {
 	const url = new URL(`${await registryAPI()}${path}`);
 	const headers = {};
-	if (token) headers.Authorization = `Bearer ${token}`;
+	if (scope) {
+		const token = await doAuth(scope);
+		if (token) headers.Authorization = `Bearer ${token}`;
+	}
 	const response = await fetch(url, { method: 'HEAD', headers });
 	return response.headers;
 }
@@ -126,11 +132,11 @@ async function repos(last = null) {
 			repositories: p.map(r => r.full_name),
 		};
 	}
-	return paginatable('/v2/_catalog', await repositoriesPerPage(), last);
+	return paginatable('/v2/_catalog', null, await repositoriesPerPage(), last);
 }
 
 async function repo(name) {
-	return get(`/v2/${name}`);
+	return get(`/v2/${name}`, `repository:${name}:pull`);
 }
 
 async function tags(name, last = null) {
@@ -141,15 +147,15 @@ async function tags(name, last = null) {
 				.tags.map(t => t[0].name),
 		};
 	}
-	return paginatable(`/v2/${name}/tags/list`, await tagsPerPage(), last);
+	return paginatable(`/v2/${name}/tags/list`, `repository:${name}:pull`, await tagsPerPage(), last);
 }
 
 async function tag(name, ref) {
-	return get(`/v2/${name}/manifests/${ref}`);
+	return get(`/v2/${name}/manifests/${ref}`, `repository:${name}:pull`);
 }
 
 async function blob(name, digest) {
-	const headers = await head(`/v2/${name}/blobs/${digest}`);
+	const headers = await head(`/v2/${name}/blobs/${digest}`, `repository:${name}:pull`);
 	return {
 		contentLength: parseInt(headers.get('Content-Length'), 10),
 	};
