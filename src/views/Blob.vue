@@ -22,11 +22,11 @@ import ListItem from '@/components/ListItem.vue';
 import BlobSize from '@/components/BlobSize.vue';
 
 export default {
-  components: {
-    Layout,
-    List,
-    ListItem,
-    BlobSize,
-  },
+	components: {
+		Layout,
+		List,
+		ListItem,
+		BlobSize,
+	},
 };
 </script>

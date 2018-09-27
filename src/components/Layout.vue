@@ -24,12 +24,12 @@
 import { version, source } from '@/options';
 
 export default {
-  data() {
-    return {
-      version,
-      source,
-    };
-  },
+	data() {
+		return {
+			version,
+			source,
+		};
+	},
 };
 </script>
 

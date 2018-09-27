@@ -36,43 +36,43 @@ import ListItem from '@/components/ListItem.vue';
 import Paginator from '@/components/Paginator.vue';
 
 export default {
-  components: {
-    Layout,
-    Error,
-    Toolbar,
-    List,
-    ListHeader,
-    ListItem,
-    Paginator,
-  },
-  data() {
-    return {
-      error: '',
-      registryHost: '',
-      repos: [],
-      nextLast: '',
-    };
-  },
-  async created() {
-    this.registryHost = await registryHost();
-    await this.fetchRepos();
-  },
-  methods: {
-    async fetchRepos() {
-      try {
-        const r = await repos(this.$route.query.last);
-        this.repos = r.repositories;
-        this.nextLast = r.nextLast;
-      } catch (e) {
-        console.error(e);
-        this.error = `Unable to fetch repositories (${e.name})`;
-      }
-    },
-  },
-  watch: {
-    async $route() {
-      await this.fetchRepos();
-    },
-  },
+	components: {
+		Layout,
+		Error,
+		Toolbar,
+		List,
+		ListHeader,
+		ListItem,
+		Paginator,
+	},
+	data() {
+		return {
+			error: '',
+			registryHost: '',
+			repos: [],
+			nextLast: '',
+		};
+	},
+	async created() {
+		this.registryHost = await registryHost();
+		await this.fetchRepos();
+	},
+	methods: {
+		async fetchRepos() {
+			try {
+				const r = await repos(this.$route.query.last);
+				this.repos = r.repositories;
+				this.nextLast = r.nextLast;
+			} catch (e) {
+				console.error(e);
+				this.error = `Unable to fetch repositories (${e.name})`;
+			}
+		},
+	},
+	watch: {
+		async $route() {
+			await this.fetchRepos();
+		},
+	},
 };
 </script>

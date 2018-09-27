@@ -39,44 +39,44 @@ import Paginator from '@/components/Paginator.vue';
 import TagSize from '@/components/TagSize.vue';
 
 export default {
-  components: {
-    Layout,
-    Error,
-    Toolbar,
-    List,
-    ListHeader,
-    ListItem,
-    Paginator,
-    TagSize,
-  },
-  data() {
-    return {
-      error: '',
-      registryHost: '',
-      tags: [],
-      nextLast: '',
-    };
-  },
-  async created() {
-    this.registryHost = await registryHost();
-    await this.fetchTags();
-  },
-  methods: {
-    async fetchTags() {
-      try {
-        const r = await tags(this.$route.params.repo, this.$route.query.last);
-        this.tags = r.tags;
-        this.nextLast = r.nextLast;
-      } catch (e) {
-        console.error(e);
-        this.error = `Unable to fetch tags (${e.name})`;
-      }
-    },
-  },
-  watch: {
-    async $route() {
-      await this.fetchTags();
-    },
-  },
+	components: {
+		Layout,
+		Error,
+		Toolbar,
+		List,
+		ListHeader,
+		ListItem,
+		Paginator,
+		TagSize,
+	},
+	data() {
+		return {
+			error: '',
+			registryHost: '',
+			tags: [],
+			nextLast: '',
+		};
+	},
+	async created() {
+		this.registryHost = await registryHost();
+		await this.fetchTags();
+	},
+	methods: {
+		async fetchTags() {
+			try {
+				const r = await tags(this.$route.params.repo, this.$route.query.last);
+				this.tags = r.tags;
+				this.nextLast = r.nextLast;
+			} catch (e) {
+				console.error(e);
+				this.error = `Unable to fetch tags (${e.name})`;
+			}
+		},
+	},
+	watch: {
+		async $route() {
+			await this.fetchTags();
+		},
+	},
 };
 </script>

@@ -7,17 +7,17 @@
 
 <script>
 export default {
-  props: {
-    nextLast: String,
-  },
-  methods: {
-    prev() {
-      this.$router.back();
-    },
-    next() {
-      this.$router.push(`?last=${this.nextLast}`);
-    },
-  },
+	props: {
+		nextLast: String,
+	},
+	methods: {
+		prev() {
+			this.$router.back();
+		},
+		next() {
+			this.$router.push(`?last=${this.nextLast}`);
+		},
+	},
 };
 </script>
 

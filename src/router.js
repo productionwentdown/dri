@@ -8,28 +8,40 @@ import Blob from '@/views/Blob.vue';
 
 Vue.use(Router);
 
+const removeEncode = (to, _, next) => {
+	if (to.path.indexOf('%2F') > -1) {
+		return next({
+			path: to.path.replace('%2F', '/'),
+		});
+	}
+	return next();
+};
+
 export default new Router({
-  //mode: 'history',
-  routes: [
-    {
-      path: '/',
-      name: 'repos',
-      component: Repos,
-    },
-    {
-      path: '/:repo+/blobs/:digest',
-      name: 'blob',
-      component: Blob,
-    },
-    {
-      path: '/:repo+/tags/:tag',
-      name: 'tag',
-      component: Tag,
-    },
-    {
-      path: '/:repo+',
-      name: 'repo',
-      component: Repo,
-    },
-  ],
+	// mode: 'history',
+	routes: [
+		{
+			path: '/',
+			name: 'repos',
+			component: Repos,
+		},
+		{
+			path: '/:repo+/blobs/:digest',
+			name: 'blob',
+			component: Blob,
+			beforeEnter: removeEncode,
+		},
+		{
+			path: '/:repo+/tags/:tag',
+			name: 'tag',
+			component: Tag,
+			beforeEnter: removeEncode,
+		},
+		{
+			path: '/:repo+',
+			name: 'repo',
+			component: Repo,
+			beforeEnter: removeEncode,
+		},
+	],
 });
