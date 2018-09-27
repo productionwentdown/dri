@@ -30,7 +30,7 @@ function parseWWWAuthenticate(text) {
 
 const cachedTokens = {};
 async function doAuth(scope) {
-	if (cachedTokens[scope] !== null) {
+	if (cachedTokens[scope] !== undefined) {
 		return cachedTokens[scope];
 	}
 

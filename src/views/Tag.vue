@@ -28,7 +28,7 @@
             </ListHeader>
             <ListItem
                v-for="(layer, i) in tag.layers"
-               :key="layer.digest"
+               :key="i"
                :to="{ name: 'blob', params: { repo: $route.params.repo, digest: layer.digest }}">
                 <span slot="title" :title="layer.digest">{{ identifier(tag, i) }}</span>
                 <span slot="detail">{{ command(tag, i) }}</span>
