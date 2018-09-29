@@ -9,10 +9,11 @@
             <ListHeader slot="header">
                 <span slot="title">Tag</span>
                 <span slot="detail">Pull Commmand</span>
+                <span slot="date">Created</span>
                 <span slot="size">Size</span>
             </ListHeader>
             <ListItem
-                v-for="tag in tags"
+                v-for="(tag, i) in tags"
                 :key="tag"
                 :to="{ name: 'tag', params: { tag, }}">
                 <span slot="title">
@@ -21,6 +22,9 @@
                 <span slot="detail">
                     <code>docker pull {{ registryHost }}/{{ $route.params.repo }}:{{ tag }}</code>
                 </span>
+                <time slot="date" :datetime="dates[i]">
+					{{ dates[i].toLocaleString() }}
+				</time>
                 <TagSize slot="size" :repo="$route.params.repo" :tag="tag" />
             </ListItem>
         </List>
@@ -30,7 +34,7 @@
 
 <script>
 import { registryHost } from '@/options';
-import { tags, repoCanDelete, repoDelete } from '@/api';
+import { tags, repoCanDelete, repoDelete, tag, configBlob } from '@/api';
 
 import Layout from '@/components/Layout.vue';
 import Error from '@/components/Error.vue';
@@ -59,6 +63,7 @@ export default {
 			error: '',
 			registryHost: '',
 			tags: [],
+			dates: [],
 			repoCanDelete: false,
 			nextLast: '',
 		};
@@ -83,6 +88,13 @@ export default {
 				this.tags = r.tags;
 				this.nextLast = r.nextLast;
 				this.repoCanDelete = await repoCanDelete(this.$route.params.repo);
+
+				// fetch tag dates
+				this.dates = await Promise.all(r.tags.map(async (tagName) => {
+					const t = await tag(this.$route.params.repo, tagName);
+					const config = await configBlob(this.$route.params.repo, t.config.digest);
+					return new Date(config.created);
+				}));
 			} catch (e) {
 				console.error(e);
 				this.error = `Unable to fetch tags (${e.message})`;

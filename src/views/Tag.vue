@@ -16,7 +16,7 @@
             </ListItem>
             <ListItem>
 				<span slot="title">Date Created</span>
-                <span slot="detail">{{ config.created }}</span>
+                <span slot="date">{{ new Date(config.created).toLocaleString() }}</span>
             </ListItem>
             <ListItem>
 				<span slot="title">Platform</span>
@@ -24,23 +24,29 @@
             </ListItem>
             <ListItem>
 				<span slot="title">Entrypoint</span>
-				<span slot="detail"><pre>{{ config.config.Entrypoint.join(' ') }}</pre></span>
+				<span slot="detail"><code>{{ config.config.Entrypoint }}</code></span>
             </ListItem>
             <ListItem>
 				<span slot="title">Command</span>
-				<span slot="detail"><pre>{{ config.config.Cmd.join(' ') }}</pre></span>
+				<span slot="detail"><code>{{ config.config.Cmd }}</code></span>
             </ListItem>
             <ListItem>
 				<span slot="title">Labels</span>
-				<span slot="detail"><pre>{{ formatLabels(config.config.Labels) }}</pre></span>
+				<span slot="detail">
+					<ul style="text-align: left; list-style: none;">
+						<li v-for="(v, k) in config.config.Labels" :key="k">
+							<code>{{ k }}: {{ v }}</code>
+						</li>
+					</ul>
+				</span>
             </ListItem>
 			<ListItem>
                 <span slot="title">Layers</span>
-                <span slot="detail">{{ tag.layers.length }}</span>
+                <span slot="size">{{ tag.layers.length }}</span>
             </ListItem>
             <ListItem>
                 <span slot="title">Size</span>
-                <span slot="detail">
+                <span slot="size">
 					<TagSize :repo="$route.params.repo" :tag="$route.params.tag" />
 				</span>
             </ListItem>
