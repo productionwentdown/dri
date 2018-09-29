@@ -1,36 +1,37 @@
 <template>
-    <Layout>
-        <h1 slot="title">{{ $route.params.repo }}:{{ $route.params.tag }}</h1>
-        <Error slot="error" :message='error' />
+	<Layout>
+		<h1 slot="title">{{ $route.params.repo }}:{{ $route.params.tag }}</h1>
+		<Error slot="error" :message='error' />
 		<Toolbar slot="toolbar">
-		<ToolbarButton v-if="tagCanDelete" @click="deleteTag" danger>Delete</ToolbarButton>		</Toolbar>
-        <h2>Details</h2>
-        <List>
-            <ListItem>
-                <span slot="title">Schema Version</span>
-                <span slot="detail">{{ tag.schemaVersion }}</span>
-            </ListItem>
-            <ListItem>
+			<ToolbarButton v-if="tagCanDelete" @click="deleteTag" danger>Delete</ToolbarButton>
+		</Toolbar>
+		<h2>Details</h2>
+		<List>
+			<ListItem>
+				<span slot="title">Schema Version</span>
+				<span slot="detail">{{ tag.schemaVersion }}</span>
+			</ListItem>
+			<ListItem>
 				<span slot="title">Full Digest</span>
-                <span slot="detail">{{ tag.headers.get('Docker-Content-Digest') }}</span>
-            </ListItem>
-            <ListItem>
+				<span slot="detail">{{ tag.headers.get('Docker-Content-Digest') }}</span>
+			</ListItem>
+			<ListItem>
 				<span slot="title">Date Created</span>
-                <span slot="date">{{ new Date(config.created).toLocaleString() }}</span>
-            </ListItem>
-            <ListItem>
+				<span slot="date">{{ new Date(config.created).toLocaleString() }}</span>
+			</ListItem>
+			<ListItem>
 				<span slot="title">Platform</span>
 				<span slot="detail">{{ config.os }} {{ config.architecture }}</span>
-            </ListItem>
-            <ListItem>
+			</ListItem>
+			<ListItem>
 				<span slot="title">Entrypoint</span>
 				<span slot="detail"><code>{{ config.config.Entrypoint }}</code></span>
-            </ListItem>
-            <ListItem>
+			</ListItem>
+			<ListItem>
 				<span slot="title">Command</span>
 				<span slot="detail"><code>{{ config.config.Cmd }}</code></span>
-            </ListItem>
-            <ListItem>
+			</ListItem>
+			<ListItem>
 				<span slot="title">Labels</span>
 				<span slot="detail">
 					<ul style="text-align: left; list-style: none;">
@@ -39,35 +40,35 @@
 						</li>
 					</ul>
 				</span>
-            </ListItem>
+			</ListItem>
 			<ListItem>
-                <span slot="title">Layers</span>
-                <span slot="size">{{ tag.layers.length }}</span>
-            </ListItem>
-            <ListItem>
-                <span slot="title">Size</span>
-                <span slot="size">
+				<span slot="title">Layers</span>
+				<span slot="size">{{ tag.layers.length }}</span>
+			</ListItem>
+			<ListItem>
+				<span slot="title">Size</span>
+				<span slot="size">
 					<TagSize :repo="$route.params.repo" :tag="$route.params.tag" />
 				</span>
-            </ListItem>
-        </List>
-        <h2>Layers</h2>
-        <List>
-            <ListHeader slot="header">
-                <span slot="title">Digest</span>
-                <span slot="detail">Summary</span>
-                <span slot="size">Size</span>
-            </ListHeader>
-            <ListItem
-               v-for="(layer, i) in tag.layers"
-               :key="i"
-               :to="{ name: 'blob', params: { repo: $route.params.repo, digest: layer.digest }}">
-                <span slot="title" :title="layer.digest">{{ identifier(tag, i) }}</span>
-                <span slot="detail">{{ command(tag, i) }}</span>
-                <BlobSize slot="size" :size="layer.size" />
-            </ListItem>
-        </List>
-    </Layout>
+			</ListItem>
+		</List>
+		<h2>Layers</h2>
+		<List>
+			<ListHeader slot="header">
+				<span slot="title">Digest</span>
+				<span slot="detail">Summary</span>
+				<span slot="size">Size</span>
+			</ListHeader>
+			<ListItem
+				v-for="(layer, i) in tag.layers"
+				:key="i"
+				:to="{ name: 'blob', params: { repo: $route.params.repo, digest: layer.digest }}">
+				<span slot="title" :title="layer.digest">{{ identifier(tag, i) }}</span>
+				<span slot="detail">{{ command(tag, i) }}</span>
+				<BlobSize slot="size" :size="layer.size" />
+			</ListItem>
+		</List>
+	</Layout>
 </template>
 
 <script>
@@ -112,6 +113,7 @@ export default {
 	},
 	methods: {
 		async deleteTag() {
+			// eslint-disable-next-line no-alert
 			if (!window.confirm(`Are you sure you want to delete ${this.$route.params.repo}:${this.$route.params.tag}?`)) {
 				return;
 			}

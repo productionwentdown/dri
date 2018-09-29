@@ -1,35 +1,35 @@
 <template>
-    <Layout>
-        <h1 slot="title">{{ $route.params.repo }}</h1>
-        <Error slot="error" :message='error' />
+	<Layout>
+		<h1 slot="title">{{ $route.params.repo }}</h1>
+		<Error slot="error" :message='error' />
 		<Toolbar slot="toolbar">
-		<ToolbarButton v-if="repoCanDelete" @click="deleteRepo" danger>Delete</ToolbarButton>
+			<ToolbarButton v-if="repoCanDelete" @click="deleteRepo" danger>Delete</ToolbarButton>
 		</Toolbar>
-        <List>
-            <ListHeader slot="header">
-                <span slot="title">Tag</span>
-                <span slot="detail">Pull Commmand</span>
-                <span slot="date">Created</span>
-                <span slot="size">Size</span>
-            </ListHeader>
-            <ListItem
-                v-for="(tag, i) in tags"
-                :key="tag"
-                :to="{ name: 'tag', params: { tag, }}">
-                <span slot="title">
-                    {{ tag }}
-                </span>
-                <span slot="detail">
-                    <code>docker pull {{ registryHost }}/{{ $route.params.repo }}:{{ tag }}</code>
-                </span>
-                <time slot="date" :datetime="dates[i]">
+		<List>
+			<ListHeader slot="header">
+				<span slot="title">Tag</span>
+				<span slot="detail">Pull Commmand</span>
+				<span slot="date">Created</span>
+				<span slot="size">Size</span>
+			</ListHeader>
+			<ListItem
+				v-for="(tag, i) in tags"
+				:key="tag"
+				:to="{ name: 'tag', params: { tag, }}">
+				<span slot="title">
+					{{ tag }}
+				</span>
+				<span slot="detail">
+					<code>docker pull {{ registryHost }}/{{ $route.params.repo }}:{{ tag }}</code>
+				</span>
+				<time slot="date" :datetime="dates[i]">
 					{{ dates[i].toLocaleString() }}
 				</time>
-                <TagSize slot="size" :repo="$route.params.repo" :tag="tag" />
-            </ListItem>
-        </List>
-        <Paginator :nextLast="nextLast" />
-    </Layout>
+				<TagSize slot="size" :repo="$route.params.repo" :tag="tag" />
+			</ListItem>
+		</List>
+		<Paginator :nextLast="nextLast" />
+	</Layout>
 </template>
 
 <script>
@@ -74,6 +74,7 @@ export default {
 	},
 	methods: {
 		async deleteRepo() {
+			// eslint-disable-next-line no-alert
 			if (!window.confirm(`Are you sure you want to delete ${this.$route.params.repo}?`)) {
 				return;
 			}

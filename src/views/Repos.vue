@@ -1,26 +1,26 @@
 <template>
-    <Layout>
-        <h1 slot="title">Repositories</h1>
-        <Error slot="error" :message='error' />
-        <List>
-            <ListHeader slot="header">
-                <span slot="title">Repository</span>
-                <span slot="detail">Pull Commmand</span>
-            </ListHeader>
-            <ListItem
-                v-for="repo in repos"
-                :key="repo"
-                :to="{ name: 'repo', params: { repo, }}">
-                <span slot="title">
-                    {{ repo }}
-                </span>
-                <span slot="detail">
-                    <code>docker pull {{ registryHost }}/{{ repo }}</code>
-                </span>
-            </ListItem>
-        </List>
-        <Paginator :nextLast="nextLast" />
-    </Layout>
+	<Layout>
+		<h1 slot="title">Repositories</h1>
+		<Error slot="error" :message='error' />
+		<List>
+			<ListHeader slot="header">
+				<span slot="title">Repository</span>
+				<span slot="detail">Pull Commmand</span>
+			</ListHeader>
+			<ListItem
+				v-for="repo in repos"
+				:key="repo"
+				:to="{ name: 'repo', params: { repo, }}">
+				<span slot="title">
+					{{ repo }}
+				</span>
+				<span slot="detail">
+					<code>docker pull {{ registryHost }}/{{ repo }}</code>
+				</span>
+			</ListItem>
+		</List>
+		<Paginator :nextLast="nextLast" />
+	</Layout>
 </template>
 
 <script>

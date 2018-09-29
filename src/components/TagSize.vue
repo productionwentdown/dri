@@ -1,5 +1,5 @@
 <template>
-    <LoadableText :text="text" />
+	<LoadableText :text="text" />
 </template>
 
 <script>

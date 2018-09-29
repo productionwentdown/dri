@@ -19,7 +19,7 @@ button {
 	outline: none;
 	border-radius: 0.5rem;
 	background: #66f;
-    padding: 0.5rem 0.75rem;
+	padding: 0.5rem 0.75rem;
 	color: #fff;
 	tap-highlight-color: transparent;
 }
