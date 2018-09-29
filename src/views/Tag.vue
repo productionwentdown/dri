@@ -112,6 +112,9 @@ export default {
 	},
 	methods: {
 		async deleteTag() {
+			if (!window.confirm(`Are you sure you want to delete ${this.$route.params.repo}:${this.$route.params.tag}?`)) {
+				return;
+			}
 			try {
 				await tagDelete(this.$route.params.repo, this.$route.params.tag);
 				this.$router.push({ name: 'repo', params: { repo: this.$route.params.repo } });

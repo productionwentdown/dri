@@ -74,6 +74,9 @@ export default {
 	},
 	methods: {
 		async deleteRepo() {
+			if (!window.confirm(`Are you sure you want to delete ${this.$route.params.repo}?`)) {
+				return;
+			}
 			try {
 				await repoDelete(this.$route.params.repo);
 				this.$router.push({ name: 'repos' });
