@@ -1,6 +1,6 @@
 import parseLink from 'parse-link-header';
 
-import { registryAPI, repositoriesPerPage, tagsPerPage, usePortusExplore } from '@/options';
+import { registryAPI, deleteEnabled, repositoriesPerPage, tagsPerPage, usePortusExplore } from '@/options';
 
 function parseWWWAuthenticate(text) {
 	const result = {};
@@ -86,28 +86,40 @@ async function paginatable(path, scope, n, last = null) {
 	return Object.assign(await response.json(), { nextLast });
 }
 
-async function get(path, scope) {
+async function request(method, path, scope, accept) {
 	const url = new URL(`${await registryAPI()}${path}`);
 	const headers = {};
+	if (accept) {
+		headers.Accept = accept;
+	}
 	if (scope) {
 		const token = await doAuth(scope);
 		if (token) headers.Authorization = `Bearer ${token}`;
 	}
-	const response = await fetch(url, { headers });
-	return response.json();
-}
-
-async function head(path, scope) {
-	const url = new URL(`${await registryAPI()}${path}`);
-	const headers = {};
-	if (scope) {
-		const token = await doAuth(scope);
-		if (token) headers.Authorization = `Bearer ${token}`;
+	const response = await fetch(url, { method, headers });
+	if (!response.ok) {
+		if (method === 'HEAD') {
+			throw new Error(`${response.statusText}`);
+		} else if (response.headers.get('Content-Type').startsWith('application/json')) {
+			const r = await response.json();
+			const firstError = r.errors[0];
+			if (firstError) {
+				throw new Error(`${firstError.code}: ${firstError.message}`);
+			}
+		}
+		throw new Error(`${response.statusText}`);
 	}
-	const response = await fetch(url, { method: 'HEAD', headers });
-	return response.headers;
+	if (!response.headers.get('Content-Type').startsWith('application/json')) {
+		console.warn('response returned was not JSON, parsing may fail');
+	}
+	if (method === 'HEAD' || parseInt(response.headers.get('Content-Length'), 10) < 1) {
+		return { headers: response.headers };
+	}
+	return {
+		...(await response.json()),
+		headers: response.headers,
+	};
 }
-
 
 async function portus() {
 // TODO: Use the Portus API when it enables anonymous access
@@ -135,10 +147,6 @@ async function repos(last = null) {
 	return paginatable('/v2/_catalog', null, await repositoriesPerPage(), last);
 }
 
-async function repo(name) {
-	return get(`/v2/${name}`, `repository:${name}:pull`);
-}
-
 async function tags(name, last = null) {
 	if (await usePortusExplore()) {
 		const p = await portus();
@@ -151,20 +159,66 @@ async function tags(name, last = null) {
 }
 
 async function tag(name, ref) {
-	return get(`/v2/${name}/manifests/${ref}`, `repository:${name}:pull`);
+	return request('GET', `/v2/${name}/manifests/${ref}`, `repository:${name}:pull`, 'application/vnd.docker.distribution.manifest.v2+json');
+}
+
+async function tagCanDelete(name, ref) {
+	if (!await deleteEnabled()) {
+		return false;
+	}
+	try {
+		const { headers } = await request('HEAD', `/v2/${name}/manifests/${ref}`, `repository:${name}:delete`, 'application/vnd.docker.distribution.manifest.v2+json');
+		request('HEAD', `/v2/${name}/manifests/${headers.get('Docker-Content-Digest')}`, `repository:${name}:delete`);
+		return true;
+	} catch (e) {
+		return false;
+	}
+}
+
+async function tagDelete(name, ref) {
+	const tagManifest = await tag(name, ref);
+	// delete each blob
+	// await Promise.all(tagManifest.layers.map(l =>
+	//	request('DELETE', `/v2/${name}/blobs/${l.digest}`, `repository:${name}:delete`)));
+	return request('DELETE', `/v2/${name}/manifests/${tagManifest.headers.get('Docker-Content-Digest')}`, `repository:${name}:delete`);
+}
+
+async function repoCanDelete(name) {
+	if (!await deleteEnabled()) {
+		return false;
+	}
+	const r = await request('GET', `/v2/${name}/tags/list`, `repository:${name}:delete`);
+	if (!r.tags) {
+		return false;
+	}
+	return Promise.race(r.tags.map(t => tagCanDelete(name, t)));
+}
+
+async function repoDelete(name) {
+	const r = await request('GET', `/v2/${name}/tags/list`, `repository:${name}:delete`);
+	return Promise.all(r.tags.map(t => tagDelete(name, t)));
 }
 
 async function blob(name, digest) {
-	const headers = await head(`/v2/${name}/blobs/${digest}`, `repository:${name}:pull`);
+	const { headers } = await request('HEAD', `/v2/${name}/blobs/${digest}`, `repository:${name}:pull`);
 	return {
+		dockerContentDigest: headers.get('Docker-Content-Digest'),
 		contentLength: parseInt(headers.get('Content-Length'), 10),
 	};
 }
 
+async function configBlob(name, digest) {
+	return request('GET', `/v2/${name}/blobs/${digest}`, `repository:${name}:pull`);
+}
+
 export {
 	repos,
-	repo,
 	tags,
 	tag,
+	tagCanDelete,
+	tagDelete,
+	repoCanDelete,
+	repoDelete,
 	blob,
+	configBlob,
 };

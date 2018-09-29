@@ -2,6 +2,8 @@
     <Layout>
         <h1 slot="title">{{ $route.params.repo }}:{{ $route.params.tag }}</h1>
         <Error slot="error" :message='error' />
+		<Toolbar slot="toolbar">
+		<ToolbarButton v-if="tagCanDelete" @click="deleteTag" danger>Delete</ToolbarButton>		</Toolbar>
         <h2>Details</h2>
         <List>
             <ListItem>
@@ -9,8 +11,32 @@
                 <span slot="detail">{{ tag.schemaVersion }}</span>
             </ListItem>
             <ListItem>
-                <span slot="title">Architecture</span>
-                <span slot="detail">{{ tag.architecture }}</span>
+				<span slot="title">Full Digest</span>
+                <span slot="detail">{{ tag.headers.get('Docker-Content-Digest') }}</span>
+            </ListItem>
+            <ListItem>
+				<span slot="title">Date Created</span>
+                <span slot="detail">{{ config.created }}</span>
+            </ListItem>
+            <ListItem>
+				<span slot="title">Platform</span>
+				<span slot="detail">{{ config.os }} {{ config.architecture }}</span>
+            </ListItem>
+            <ListItem>
+				<span slot="title">Entrypoint</span>
+				<span slot="detail"><pre>{{ config.config.Entrypoint.join(' ') }}</pre></span>
+            </ListItem>
+            <ListItem>
+				<span slot="title">Command</span>
+				<span slot="detail"><pre>{{ config.config.Cmd.join(' ') }}</pre></span>
+            </ListItem>
+            <ListItem>
+				<span slot="title">Labels</span>
+				<span slot="detail"><pre>{{ formatLabels(config.config.Labels) }}</pre></span>
+            </ListItem>
+			<ListItem>
+                <span slot="title">Layers</span>
+                <span slot="detail">{{ tag.layers.length }}</span>
             </ListItem>
             <ListItem>
                 <span slot="title">Size</span>
@@ -32,7 +58,7 @@
                :to="{ name: 'blob', params: { repo: $route.params.repo, digest: layer.digest }}">
                 <span slot="title" :title="layer.digest">{{ identifier(tag, i) }}</span>
                 <span slot="detail">{{ command(tag, i) }}</span>
-                <BlobSize slot="size" :repo="$route.params.repo" :blob="layer.digest" />
+                <BlobSize slot="size" :size="layer.size" />
             </ListItem>
         </List>
     </Layout>
@@ -40,11 +66,12 @@
 
 <script>
 import { registryHost } from '@/options';
-import { tag } from '@/api';
+import { tag, tagCanDelete, tagDelete, configBlob } from '@/api';
 
 import Layout from '@/components/Layout.vue';
 import Error from '@/components/Error.vue';
 import Toolbar from '@/components/Toolbar.vue';
+import ToolbarButton from '@/components/ToolbarButton.vue';
 import List from '@/components/List.vue';
 import ListHeader from '@/components/ListHeader.vue';
 import ListItem from '@/components/ListItem.vue';
@@ -56,6 +83,7 @@ export default {
 		Layout,
 		Error,
 		Toolbar,
+		ToolbarButton,
 		List,
 		ListHeader,
 		ListItem,
@@ -66,7 +94,9 @@ export default {
 		return {
 			error: '',
 			registryHost: '',
-			tag: {},
+			tag: { },
+			config: {},
+			tagCanDelete: false,
 			layers: [],
 		};
 	},
@@ -75,20 +105,36 @@ export default {
 		await this.fetchTag();
 	},
 	methods: {
+		async deleteTag() {
+			try {
+				await tagDelete(this.$route.params.repo, this.$route.params.tag);
+				this.$router.push({ name: 'repo', params: { repo: this.$route.params.repo } });
+			} catch (e) {
+				console.error(e);
+				this.error = `Unable to delete tag (${e.message})`;
+			}
+		},
 		async fetchTag() {
 			try {
 				const r = await tag(this.$route.params.repo, this.$route.params.tag);
 				if (r.mediaType === 'application/vnd.docker.distribution.manifest.list.v2+json') {
 					this.error = 'V2 manifest lists not supported yet';
+					return;
 				}
 				if (r.schemaVersion === 1) {
 					r.layers = r.fsLayers.map(l => ({ digest: l.blobSum }));
 				}
 				this.tag = r;
-				console.log(r);
+				this.tagCanDelete = await tagCanDelete(this.$route.params.repo, this.$route.params.tag);
+
+				// extract configuration
+				if (r.config.mediaType !== 'application/vnd.docker.container.image.v1+json') {
+					this.error = 'configuration mediaType not supported';
+				}
+				this.config = await configBlob(this.$route.params.repo, r.config.digest);
 			} catch (e) {
 				console.error(e);
-				this.error = `Unable to fetch tag (${e.name})`;
+				this.error = `Unable to fetch tag (${e.message})`;
 			}
 		},
 		identifier(t, n) {
@@ -96,6 +142,9 @@ export default {
 		},
 		command() {
 			return 'not implemented';
+		},
+		formatLabels(l) {
+			return Object.keys(l).map(k => `${k}: ${l[k]}`).join('\n');
 		},
 	},
 	watch: {

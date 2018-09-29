@@ -65,7 +65,7 @@ export default {
 				this.nextLast = r.nextLast;
 			} catch (e) {
 				console.error(e);
-				this.error = `Unable to fetch repositories (${e.name})`;
+				this.error = `Unable to fetch repositories (${e.message})`;
 			}
 		},
 	},

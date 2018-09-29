@@ -2,6 +2,9 @@
     <Layout>
         <h1 slot="title">{{ $route.params.repo }}</h1>
         <Error slot="error" :message='error' />
+		<Toolbar slot="toolbar">
+		<ToolbarButton v-if="repoCanDelete" @click="deleteRepo" danger>Delete</ToolbarButton>
+		</Toolbar>
         <List>
             <ListHeader slot="header">
                 <span slot="title">Tag</span>
@@ -27,11 +30,12 @@
 
 <script>
 import { registryHost } from '@/options';
-import { tags } from '@/api';
+import { tags, repoCanDelete, repoDelete } from '@/api';
 
 import Layout from '@/components/Layout.vue';
 import Error from '@/components/Error.vue';
 import Toolbar from '@/components/Toolbar.vue';
+import ToolbarButton from '@/components/ToolbarButton.vue';
 import List from '@/components/List.vue';
 import ListHeader from '@/components/ListHeader.vue';
 import ListItem from '@/components/ListItem.vue';
@@ -43,6 +47,7 @@ export default {
 		Layout,
 		Error,
 		Toolbar,
+		ToolbarButton,
 		List,
 		ListHeader,
 		ListItem,
@@ -54,6 +59,7 @@ export default {
 			error: '',
 			registryHost: '',
 			tags: [],
+			repoCanDelete: false,
 			nextLast: '',
 		};
 	},
@@ -62,14 +68,24 @@ export default {
 		await this.fetchTags();
 	},
 	methods: {
+		async deleteRepo() {
+			try {
+				await repoDelete(this.$route.params.repo);
+				this.$router.push({ name: 'repos' });
+			} catch (e) {
+				console.error(e);
+				this.error = `Unable to delete repo (${e.message})`;
+			}
+		},
 		async fetchTags() {
 			try {
 				const r = await tags(this.$route.params.repo, this.$route.query.last);
 				this.tags = r.tags;
 				this.nextLast = r.nextLast;
+				this.repoCanDelete = await repoCanDelete(this.$route.params.repo);
 			} catch (e) {
 				console.error(e);
-				this.error = `Unable to fetch tags (${e.name})`;
+				this.error = `Unable to fetch tags (${e.message})`;
 			}
 		},
 	},

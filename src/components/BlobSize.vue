@@ -1,5 +1,5 @@
 <template>
-    <LoadableText :text="size" />
+    <LoadableText :text="text" />
 </template>
 
 <script>
@@ -14,15 +14,22 @@ export default {
 	props: {
 		repo: String,
 		blob: String,
+		size: Number,
 	},
 	data() {
 		return {
-			size: '',
+			text: '',
 		};
 	},
 	async created() {
+		if (this.size) {
+			this.text = filesize(this.size);
+			return;
+		}
 		const size = await blob(this.repo, this.blob);
-		this.size = filesize(size.contentLength);
+		if (size.contentLength) {
+			this.text = filesize(size.contentLength);
+		}
 	},
 };
 </script>

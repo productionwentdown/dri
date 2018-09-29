@@ -1,10 +1,10 @@
 <template>
-    <LoadableText :text="size" />
+    <LoadableText :text="text" />
 </template>
 
 <script>
 import filesize from 'filesize';
-import { tag, blob } from '@/api';
+import { tag } from '@/api';
 import LoadableText from '@/components/LoadableText.vue';
 
 export default {
@@ -14,10 +14,11 @@ export default {
 	props: {
 		repo: String,
 		tag: String,
+		size: Number,
 	},
 	data() {
 		return {
-			size: '',
+			text: '',
 		};
 	},
 	async created() {
@@ -27,13 +28,11 @@ export default {
 			return;
 		}
 		if (r.schemaVersion === 1) {
-			r.layers = r.fsLayers.map(l => ({ digest: l.blobSum }));
+			console.error('V1 manifests not supported');
+			return;
 		}
-		const sizes = await Promise.all(r.layers.map(async layer => (
-			await blob(this.repo, layer.digest)
-		).contentLength));
-		const total = sizes.reduce((a, b) => a + b, 0);
-		this.size = filesize(total);
+		const total = r.layers.reduce((a, b) => a + b.size, 0);
+		this.text = filesize(total);
 	},
 };
 </script>

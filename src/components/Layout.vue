@@ -40,6 +40,8 @@ header, footer, main {
 header, footer, .content {
     padding: 1rem;
 }
+.content {
+width: fit-content;}
 header, footer {
     max-width: 38rem;
     text-align: center;

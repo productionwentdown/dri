@@ -7,10 +7,11 @@ const defaultConfig = {
 	registryHost: process.env.VUE_APP_REGISTRY_HOST,
 	registryAPI: process.env.VUE_APP_REGISTRY_API,
 
-	repositoriesPerPage: process.env.VUE_APP_REPOSITORIES_PER_PAGE,
-	tagsPerPage: process.env.VUE_APP_TAGS_PER_PAGE,
+	deleteEnabled: process.env.VUE_APP_DELETE_ENABLED === 'true',
+	repositoriesPerPage: parseInt(process.env.VUE_APP_REPOSITORIES_PER_PAGE, 10),
+	tagsPerPage: parseInt(process.env.VUE_APP_TAGS_PER_PAGE, 10),
 
-	usePortusExplore: process.env.VUE_APP_USE_PORTUS_EXPLORE,
+	usePortusExplore: process.env.VUE_APP_USE_PORTUS_EXPLORE === 'true',
 };
 
 async function config() {
@@ -49,9 +50,9 @@ async function registryAPI() {
 	return `${window.location.protocol}//${host}`;
 }
 
-async function usePortusExplore() {
+async function deleteEnabled() {
 	const c = await config();
-	if (c.usePortusExplore) {
+	if (c.deleteEnabled) {
 		return true;
 	}
 	return false;
@@ -79,11 +80,20 @@ async function tagsPerPage() {
 	return 0;
 }
 
+async function usePortusExplore() {
+	const c = await config();
+	if (c.usePortusExplore) {
+		return true;
+	}
+	return false;
+}
+
 export {
 	version,
 	source,
 	registryHost,
 	registryAPI,
+	deleteEnabled,
 	repositoriesPerPage,
 	tagsPerPage,
 	usePortusExplore,
