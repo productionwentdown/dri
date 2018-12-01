@@ -8,6 +8,6 @@ Docker Registry Interface (dri) is a static-site Docker Distribution Registry vi
 * View repositories and tags
 * View tag details and sizes of tags
 * Delete repositories and tags (if enabled on the registry)
-* Optionally scan for vulnerabilities using CoreOS Clair
+* [WIP] Optionally scan for vulnerabilities using CoreOS Clair
 * Hacky support for repository lists in Portus (by scraping HTML)
 
