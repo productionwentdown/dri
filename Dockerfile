@@ -7,7 +7,7 @@ ENV VUE_APP_VERSION=${version}
 ENV VUE_APP_SOURCE_LINK="https://${repo}"
 
 # dependencies
-RUN apk add --no-cache git=2.18.0-r0
+RUN apk add --no-cache git=2.18.1-r0
 
 # source
 WORKDIR /app
