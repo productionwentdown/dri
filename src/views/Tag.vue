@@ -63,8 +63,12 @@
 				v-for="(layer, i) in tag.layers"
 				:key="i"
 				:to="{ name: 'blob', params: { repo: $route.params.repo, digest: layer.digest }}">
-				<span slot="title" :title="layer.digest">{{ identifier(tag, i) }}</span>
-				<span slot="detail">{{ command(tag, i) }}</span>
+				<span slot="title" :title="layer.digest">
+					{{ identifier(layer.digest) }}
+				</span>
+				<span slot="detail" :title="config.history[i].created_by">
+					{{ summary(config.history[i].created_by) }}
+				</span>
 				<BlobSize slot="size" :size="layer.size" />
 			</ListItem>
 		</List>
@@ -148,11 +152,11 @@ export default {
 				this.error = `Unable to fetch tag (${e.message})`;
 			}
 		},
-		identifier(t, n) {
-			return t.layers[n].digest.split(':')[1].slice(0, 10);
+		identifier(digest) {
+			return digest.split(':')[1].slice(0, 10);
 		},
-		command() {
-			return 'not implemented';
+		summary(createdBy) {
+			return createdBy.slice(0, 80);
 		},
 		formatLabels(l) {
 			return Object.keys(l).map(k => `${k}: ${l[k]}`).join('\n');

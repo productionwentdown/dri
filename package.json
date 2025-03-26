@@ -10,15 +10,15 @@
     "filesize": "^3.6.1",
     "normalize.css": "^8.0.0",
     "parse-link-header": "^2.0.0",
-    "vue": "^2.5.17",
-    "vue-router": "^3.0.1"
+    "vue": "^2.7.16",
+    "vue-router": "^3.6.5"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.12.1",
+    "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-eslint": "^3.0.3",
     "@vue/cli-service": "^5.0.8",
     "@vue/eslint-config-airbnb": "^3.0.3",
-    "lint-staged": "^6.0.0",
+    "lint-staged": "^15.5.0",
     "vue-template-compiler": "^2.5.17"
   },
   "gitHooks": {
@@ -29,12 +29,10 @@
       "hadolint"
     ],
     "*.js": [
-      "vue-cli-service lint",
-      "git add"
+      "vue-cli-service lint"
     ],
     "*.vue": [
-      "vue-cli-service lint",
-      "git add"
+      "vue-cli-service lint"
     ]
   }
 }
