@@ -15,7 +15,7 @@ COPY . .
 
 # build
 RUN npm clean-install
-RUN npm RUN build
+RUN npm run build
 
 
 FROM caddy:2-alpine
