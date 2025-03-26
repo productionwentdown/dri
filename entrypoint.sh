@@ -16,7 +16,6 @@ sed -i "s~<base href=/ >~<base href=\"$BASE_URL\">~" /srv/index.html
 cat > /etc/Caddyfile << EOF
 :80$BASE_URL {
     root /srv
-    browse
     rewrite {
         regexp (.*)
         to {1} {1}/ /
