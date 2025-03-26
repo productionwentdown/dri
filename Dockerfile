@@ -14,8 +14,8 @@ WORKDIR /app
 COPY . .
 
 # build
-RUN yarn install
-RUN yarn build
+RUN npm clean-install
+RUN npm RUN build
 
 
 FROM caddy:2-alpine
