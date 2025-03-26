@@ -1,4 +1,4 @@
-FROM node:10-alpine as build
+FROM node:10-alpine AS build
 
 # args
 ARG version="0.1.0"
@@ -18,10 +18,7 @@ RUN yarn install
 RUN yarn build
 
 
-FROM productionwentdown/caddy:0.11.0 as caddy
-
-
-FROM alpine:3.8
+FROM caddy:2-alpine
 
 ARG version
 
@@ -32,8 +29,6 @@ LABEL org.label-schema.schema-version="1.0"
 
 # copy build output
 COPY --from=build /app/dist /srv
-# copy caddy
-COPY --from=caddy /bin/caddy /usr/local/bin/caddy
 # copy entrypoint.sh
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
