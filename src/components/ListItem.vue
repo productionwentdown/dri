@@ -1,11 +1,12 @@
 <template>
-	<router-link tag="tr" :to="to || {}">
-		<td class="col title"><slot name="title" /></td>
+	<tr>
+		<router-link tag="td" class="col title link" v-if="to" :to="to"><slot name="title" /></td></router-link>
+		<td class="col title" v-if="!to"><slot name="title" /></td>
 		<td class="col detail" v-if="$slots.detail"><slot name="detail" /></td>
 		<td class="col date" v-if="$slots.date"><slot name="date" /></td>
 		<td class="col size" v-if="$slots.size"><slot name="size" /></td>
 		<td class="col buttons" v-if="$slots.buttons"><slot name="buttons" /></td>
-	</router-link>
+	</tr>
 </template>
 
 <script>
@@ -26,6 +27,9 @@ td {
 	border-bottom: 1px solid #eee;
 	border-bottom-width: 0.5px;
 	text-align: right;
+}
+.link {
+	cursor: pointer;
 }
 .title {
 	text-align: left;
