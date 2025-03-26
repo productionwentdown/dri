@@ -33,4 +33,4 @@ COPY --from=build /app/dist /srv
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["caddy", "-conf", "/etc/Caddyfile"]
+CMD ["caddy", "run", "-conf", "/etc/Caddyfile"]
