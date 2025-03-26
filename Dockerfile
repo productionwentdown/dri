@@ -3,8 +3,8 @@ FROM node:22-alpine AS build
 # args
 ARG version="0.1.0"
 ARG repo="github.com/productionwentdown/dri"
-ENV VUE_APP_VERSION=${version}
-ENV VUE_APP_SOURCE_LINK="https://${repo}"
+ENV VITE_APP_VERSION=${version}
+ENV VITE_APP_SOURCE_LINK="https://${repo}"
 
 # dependencies
 RUN apk add --no-cache git

@@ -1,13 +1,13 @@
 <template>
-	<div>
-		<slot />
-	</div>
+  <div>
+    <slot></slot>
+  </div>
 </template>
 
 <style scoped>
 div {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 </style>
