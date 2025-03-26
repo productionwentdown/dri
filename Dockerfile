@@ -1,7 +1,7 @@
 FROM node:22-alpine AS build
 
 # args
-ARG version="0.1.0"
+ARG version="0.2.0"
 ARG repo="github.com/productionwentdown/dri"
 ENV VITE_APP_VERSION=${version}
 ENV VITE_APP_SOURCE_LINK="https://${repo}"
@@ -9,12 +9,10 @@ ENV VITE_APP_SOURCE_LINK="https://${repo}"
 # dependencies
 RUN apk add --no-cache git
 
-# source
 WORKDIR /app
-COPY . .
-
-# build
+COPY package-lock.json package.json .
 RUN npm clean-install
+COPY . .
 RUN npm run build
 
 
@@ -33,4 +31,4 @@ COPY --from=build /app/dist /srv
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["caddy", "run", "-conf", "/etc/Caddyfile"]
+CMD ["caddy", "run", "--config", "/etc/Caddyfile"]
