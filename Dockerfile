@@ -27,8 +27,27 @@ LABEL org.label-schema.schema-version="1.0"
 
 # copy build output
 COPY --from=build /app/dist /srv
+# create symlink for generated content
+RUN ln -s /tmp/srv /srv/generated
+# copy caddyfile
+COPY <<'EOF' /etc/Caddyfile
+{
+    admin off
+    persist_config off
+}
+
+:80 {
+    handle_path "{$BASE_URL:/}*" {
+        root * /srv
+        encode
+        try_files /generated/{path} /{path} /generated/index.html
+        file_server
+        header /assets/* Cache-Control max-age=31536000
+    }
+}
+EOF
 # copy entrypoint.sh
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]    
 CMD ["caddy", "run", "--config", "/etc/Caddyfile"]
