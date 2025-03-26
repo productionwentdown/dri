@@ -1,4 +1,4 @@
-FROM node:10-alpine AS build
+FROM node:23-alpine AS build
 
 # args
 ARG version="0.1.0"
